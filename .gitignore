@@ -1,0 +1,30 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# Secrets
+*.pem
+*.key
+credentials*.json
+service-account*.json
+.env.*
+
+# Build output
+_build/
+build/
+dist/
+site/
