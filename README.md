@@ -10,7 +10,7 @@ pull request within minutes. Each draft comes with an explainability report, a
 confidence score from 1 to 10, and the source of every new sentence. A
 technical writer reviews and approves every draft. The agent can't merge.
 
-**[Read the design document](https://raosiddharthp.github.io/The-Autonomous-Author/)**
+**[Read the design document](https://siddharthraop.github.io/The-Autonomous-Author/)**
 
 ## Status
 
@@ -241,7 +241,7 @@ The design document is a single HTML page with no build step.
 1.  Clone the repository:
 
     ```sh
-    git clone https://github.com/raosiddharthp/The-Autonomous-Author.git
+    git clone https://github.com/siddharthraop/The-Autonomous-Author.git
     cd The-Autonomous-Author
     ```
 
@@ -289,7 +289,7 @@ the readers are fictional.
 This project is the second in a series of design documents. Each one solves
 one economic problem in documentation.
 
-1.  [MANIFEST](https://raosiddharthp.github.io/Manifest/): migrate DITA XML to
+1.  [MANIFEST](https://siddharthraop.github.io/Manifest/): migrate DITA XML to
     docs as code and prove that no content was lost.
 1.  **The Autonomous Author**: run the docs loop at the pace of the code loop,
     with a first draft on every merge.
@@ -297,7 +297,7 @@ one economic problem in documentation.
 ## Contact
 
 Siddharth Rao. To ask a question or suggest a change,
-[open an issue](https://github.com/raosiddharthp/The-Autonomous-Author/issues).
+[open an issue](https://github.com/siddharthraop/The-Autonomous-Author/issues).
 
 ## License
 
