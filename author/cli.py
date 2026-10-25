@@ -233,7 +233,13 @@ def main(argv=None):
     r.add_argument("--event")
     sub.add_parser("drift", help="daily drift check")
     a = p.parse_args(argv)
-    return {"draft": cmd_draft, "check": cmd_check, "review": cmd_review, "drift": cmd_drift}[a.cmd](a)
+    try:
+        return {"draft": cmd_draft, "check": cmd_check, "review": cmd_review, "drift": cmd_drift}[a.cmd](a)
+    except Exception as e:
+        import traceback
+        tb = traceback.format_exc().strip().splitlines()
+        print(f"::error title=author {a.cmd} failed::{type(e).__name__}: {e} | " + " | ".join(tb[-6:])[:900])
+        raise
 
 
 if __name__ == "__main__":

@@ -33,6 +33,8 @@ def render(run):
             checks.append(f"- ❓ {s['question']} — asked of {run.get('change_author') or 'the change author'}.")
         elif s["status"] == "fail":
             checks.append(f"- ❌ `{s['path']}` line {s['line']}: {s['reason']}.")
+    if run.get("model_error"):
+        checks.append(f"- ⚠️ The model call failed, so rules and questions made this draft: `{run['model_error'][:200]}`")
     checks += [f"- 🔁 Revised: {r}" for r in run["revised"]]
     checks += [f"- ⚠️ Stale value left: `{x['path']}` line {x['line']}: {x['text']}" for x in g["stale"]]
     checks += [f"- ⚠️ Not covered: `{k}`" for k, v in g["coverage"].items() if not v]

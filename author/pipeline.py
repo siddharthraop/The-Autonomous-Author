@@ -112,7 +112,12 @@ def draft(repo, base, head, model=None, ticket=None, pr=None, change_author=None
     rule_covered = {e["item"] for e in rule_edits}
     need_model = [i for i in items if i.id not in rule_covered or i.kind != "default"]
     if need_model and pages and not isinstance(model, NoModel):
-        out = model.draft(_prompt(items, tk, (pr or {}).get("body"), pages, rule_edits))
+        try:
+            out = model.draft(_prompt(items, tk, (pr or {}).get("body"), pages, rule_edits))
+        except Exception as e:  # a model failure costs the wording, never the draft
+            run["model_error"] = f"{type(e).__name__}: {e}"[:400]
+            print(f"::warning title=Model step failed; drafting without the model::{run['model_error']}")
+            out, model = {"edits": [], "sentences": []}, NoModel()
         for e in out.get("edits", []):
             p = root / e.get("path", "")
             if not (p.is_file() and e.get("path") in pid):
@@ -144,7 +149,12 @@ def draft(repo, base, head, model=None, ticket=None, pr=None, change_author=None
             break
         run["revisions"] += 1
         fb = "\n".join(f"- \"{s['text']}\" ({s['path']} line {s['line']}): {s['reason']}" for s in failed)
-        out = model.revise(_prompt(items, tk, (pr or {}).get("body"), pages, rule_edits, "## Failed sentences\n" + fb))
+        try:
+            out = model.revise(_prompt(items, tk, (pr or {}).get("body"), pages, rule_edits, "## Failed sentences\n" + fb))
+        except Exception as e:
+            run["model_error"] = f"{type(e).__name__}: {e}"[:400]
+            print(f"::warning title=Model revision failed::{run['model_error']}")
+            out = {"fixes": []}
         for f in out.get("fixes", []):
             path = next((s["path"] for s in failed if norm(s["text"]) == norm(f.get("old", ""))), None)
             if path and _replace_sentence(root, path, f["old"], f["new"]):
