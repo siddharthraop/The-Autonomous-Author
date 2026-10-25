@@ -22,7 +22,7 @@ def repo(tmp_path):
     r = tmp_path / "repo"
     r.mkdir()
     for d in ("product", "docs"):
-        shutil.copytree(ROOT / d, r / d, ignore=shutil.ignore_patterns("_build", "__pycache__"))
+        shutil.copytree(FIX / "base" / d, r / d, ignore=shutil.ignore_patterns("_build", "__pycache__"))
     sh(r, "init", "-q", "-b", "main")
     sh(r, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qam", "base", "--allow-empty")
     sh(r, "add", ".")

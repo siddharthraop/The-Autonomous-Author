@@ -18,9 +18,10 @@ def test_commit_feature_gets_draft_and_checks_pass(tmp_path):
     remote, work = tmp_path / "remote.git", tmp_path / "work"
     run(tmp_path, "git", "init", "-q", "--bare", "-b", "main", str(remote))
     work.mkdir()
-    for d in ("product", "docs", ".vale"):
-        if (ROOT / d).exists():
-            shutil.copytree(ROOT / d, work / d, ignore=shutil.ignore_patterns("_build", "__pycache__"))
+    for d in ("product", "docs"):
+        shutil.copytree(ROOT / "tests/fixtures/base" / d, work / d)
+    if (ROOT / ".vale").exists():
+        shutil.copytree(ROOT / ".vale", work / ".vale")
     shutil.copy(ROOT / ".vale.ini", work)
     g = lambda *a: run(work, "git", "-c", "user.name=Dev", "-c", "user.email=dev@example.com", *a)
     g("init", "-q", "-b", "main"), g("remote", "add", "origin", str(remote)), g("add", "."), g("commit", "-qm", "base")

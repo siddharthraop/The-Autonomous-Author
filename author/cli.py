@@ -66,7 +66,8 @@ def cmd_draft(a):
     keep["sources"] = run["sources"]
     (drafts / f"{run['run_id']}.json").write_text(json.dumps(keep, indent=1, default=str))
     git(repo, "checkout", "-q", "-B", branch)
-    git(repo, "add", "docs", str(drafts / f"{run['run_id']}.json"))
+    touched = sorted({e["path"] for e in run["edits"]})  # stage only what the agent edited
+    git(repo, "add", "--", *touched, str(drafts / f"{run['run_id']}.json"))
     subject = git(repo, "log", "-1", "--format=%s", head).strip()
     git(repo, *AGENT, "commit", "-q", "-m", f"Docs draft for {head[:7]}: {subject}\n\nRun {run['run_id']}. Confidence {run['score']['total']} / 10.")
     git(repo, "push", "-q", "-f", "origin", f"HEAD:refs/heads/{branch}")
