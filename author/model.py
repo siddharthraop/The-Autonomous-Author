@@ -59,8 +59,21 @@ class ScriptedModel:
         return self._rev.pop(0) if self._rev else {"fixes": []}
 
 
+def _clean_key():
+    """Secret Manager values pasted from a clipboard can carry extra lines. Keep the one that is a key."""
+    import re
+    for var in ("GOOGLE_API_KEY", "GEMINI_API_KEY"):
+        raw = os.environ.get(var, "")
+        lines = [l.strip() for l in raw.splitlines() if l.strip()]
+        if len(lines) > 1 or (lines and lines[0] != raw):
+            key = next((l for l in lines if re.fullmatch(r"(AIza[\w-]{30,}|AQ\.[\w.-]{20,})", l)), lines[0] if lines else "")
+            os.environ[var] = key
+            print(f"::warning title=Gemini key cleaned::{var} had {len(lines)} lines; using the one that looks like a key. Store it as one line.")
+
+
 class GeminiModel:
     def __init__(self, model_id=None):
+        _clean_key()
         from google.adk.agents import LlmAgent
         from google.adk.runners import InMemoryRunner
         from google.genai import types
