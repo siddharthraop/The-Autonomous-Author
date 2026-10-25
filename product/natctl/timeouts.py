@@ -30,6 +30,13 @@ TIMEOUTS = {
         "flag": "--udp-idle-timeout",
         "field": "udpIdleTimeoutSec",
     },
+    "icmp": {
+        "label": "ICMP",
+        "default": 30,
+        "unit": "seconds",
+        "flag": "--icmp-idle-timeout",
+        "field": "icmpIdleTimeoutSec",
+    },
 }
 
 # Fields printed by `natctl describe`.
