@@ -29,6 +29,7 @@ TIMEOUTS = {
         "unit": "seconds",
         "flag": "--udp-idle-timeout",
         "field": "udpIdleTimeoutSec",
+        "minimum": 10,
     },
     "icmp": {
         "label": "ICMP",
