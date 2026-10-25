@@ -38,4 +38,5 @@ DESCRIBE_FIELDS = [
     "tcpTransitoryIdleTimeoutSec",
     "tcpTimeWaitTimeoutSec",
     "udpIdleTimeoutSec",
+    "effectiveTcpTimeWaitTimeoutSec",
 ]
