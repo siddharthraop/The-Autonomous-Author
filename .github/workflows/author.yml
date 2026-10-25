@@ -1,0 +1,69 @@
+# Write: a code change on main starts the docs draft (design doc §5.1).
+name: autonomous-author
+on:
+  push:
+    branches: [main]
+    paths: ["product/**"]
+  workflow_dispatch:
+    inputs:
+      base:
+        description: "Base commit (default: the commit before head)"
+        required: false
+concurrency:
+  group: autonomous-author-${{ github.sha }}
+permissions:
+  contents: write        # push the draft branch and the run log
+  pull-requests: write   # open the draft docs PR
+  issues: write          # comment on the doc ticket
+  statuses: write        # post the confidence status
+  id-token: write        # Workload Identity Federation to Google Cloud
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    outputs:
+      result: ${{ steps.draft.outputs.result }}
+      branch: ${{ steps.draft.outputs.branch }}
+      sha: ${{ steps.draft.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-author
+      - name: Authenticate to Google Cloud (keyless)
+        if: vars.GCP_WIF_PROVIDER != ''
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - name: Read the Gemini key from Secret Manager
+        id: secrets
+        if: vars.GCP_WIF_PROVIDER != ''
+        uses: google-github-actions/get-secretmanager-secrets@v2
+        with:
+          secrets: |-
+            gemini:${{ vars.GCP_PROJECT }}/gemini-api-key
+      - name: Draft
+        id: draft
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GOOGLE_API_KEY: ${{ steps.secrets.outputs.gemini }}
+          AUTHOR_MODEL: ${{ vars.AUTHOR_MODEL || 'gemini-3.8-flash' }}
+          AUTHOR_BQ_TABLE: ${{ vars.AUTHOR_BQ_TABLE }}
+          JIRA_BASE_URL: ${{ vars.JIRA_BASE_URL }}
+          JIRA_EMAIL: ${{ vars.JIRA_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        run: |
+          author draft --base "${{ inputs.base || github.event.before }}" --head "${{ github.sha }}" --model auto --publish
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: author-run
+          path: .author/out/
+  docs-checks:
+    needs: draft
+    if: needs.draft.outputs.result == 'draft'
+    uses: ./.github/workflows/docs-checks.yml
+    with:
+      ref: ${{ needs.draft.outputs.branch }}
+      sha: ${{ needs.draft.outputs.sha }}
+    secrets: inherit

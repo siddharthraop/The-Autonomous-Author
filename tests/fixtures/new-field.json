@@ -1,0 +1,5 @@
+{"model": "scripted-new-field",
+ "draft": {"edits": [{"path": "docs/nat/tune-nat-configuration.md",
+    "find": "```bash\nnatctl describe my-gateway\n```\n",
+    "replace": "```bash\nnatctl describe my-gateway\n```\n\nTo see the TIME_WAIT timeout in effect, read the `effectiveTcpTimeWaitTimeoutSec` field in the output of `natctl describe`.\n"}],
+  "sentences": [{"text": "To see the TIME_WAIT timeout in effect, read the `effectiveTcpTimeWaitTimeoutSec` field in the output of `natctl describe`.", "sources": ["C1", "P2"]}]}}

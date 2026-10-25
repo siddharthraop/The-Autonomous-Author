@@ -1,0 +1,17 @@
+name: Set up the Autonomous Author
+description: Python, the engine, Vale with the Google package, and lychee.
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+        cache: pip
+    - shell: bash
+      run: pip install -q -e ".[model,test]" vale
+    - shell: bash
+      run: |
+        curl -sSfL https://github.com/lycheeverse/lychee/releases/download/lychee-v0.21.0/lychee-x86_64-unknown-linux-gnu.tar.gz | tar xz
+        sudo mv "$(find . -maxdepth 2 -name lychee -type f | head -1)" /usr/local/bin/lychee
+        vale sync
+        vale --version && lychee --version

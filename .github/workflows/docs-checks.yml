@@ -1,0 +1,40 @@
+# Test: the same checks on every docs PR, whoever wrote it (design doc §5.2).
+name: docs-checks
+on:
+  pull_request:
+    paths: ["docs/**", ".author/**", ".vale.ini"]
+  workflow_call:
+    inputs:
+      ref: {type: string, required: true}
+      sha: {type: string, required: true}
+permissions:
+  contents: read
+  statuses: write
+  pull-requests: write
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    env:
+      FIREBASE_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-author
+      - name: Style, grounding, build, links and score
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: author check --base origin/main --status --sha "${{ inputs.sha || github.event.pull_request.head.sha }}"
+      - name: Build the preview site
+        if: always()
+        run: python -m sphinx -q -b html docs docs/_build/html
+      - name: Preview URL (Firebase Hosting, expires after 7 days)
+        if: always() && env.FIREBASE_SA != ''
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ github.token }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ vars.FIREBASE_PROJECT }}
+          channelId: ${{ inputs.ref && format('draft-{0}', inputs.sha) || '' }}
+          expires: 7d

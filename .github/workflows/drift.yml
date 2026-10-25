@@ -1,0 +1,21 @@
+# Monitor: compare the last 10 runs with a baseline of 20, daily (§5.6).
+name: drift-check
+on:
+  schedule:
+    - cron: "41 5 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q -e .
+      - env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: author drift

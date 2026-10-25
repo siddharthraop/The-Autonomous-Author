@@ -14,9 +14,34 @@ technical writer reviews and approves every draft. The agent can't merge.
 
 ## Status
 
-Design document, version 0.1 (October 2026). This repository contains the
-design for a minimum viable product (MVP). The agent isn't built yet. The
-simulator in the design document is a scripted demo and doesn't call a model.
+Proof of concept, version 0.2 (October 2026). **Success test:** a developer
+changes a feature in `product/` and pushes it to `main`; within minutes a draft
+docs pull request opens with MyST changes, a confidence score and an
+explainability report, and a writer must approve it.
+
+### Try it
+
+1. Change a default in `product/natctl/timeouts.py`, for example
+   `"default": 120` to `"default": 30` for `tcp_time_wait`.
+2. Add `Doc ticket: #<issue>` to the commit message (optional).
+3. Push to `main`. The `autonomous-author` workflow opens a draft pull request
+   from `author/<sha>`, posts the report, asks the change author any
+   `[NEEDS INPUT]` questions, and runs `docs-checks` on the draft.
+
+Locally: `pip install -e ".[model,test]" vale`, then `vale sync` and
+`python -m pytest -q tests`. `author draft --base HEAD~1 --model none` drafts
+in your working tree without opening anything.
+
+### What is in the repository
+
+| Path | What it is |
+| --- | --- |
+| `product/` | Sample code: NAT gateway timeouts, flags and output fields |
+| `docs/` | Sample docs set in MyST Markdown, built with Sphinx |
+| `author/` | The agent: eight tools, the agent loop, score and report |
+| `.github/workflows/` | `autonomous-author`, `docs-checks`, `docs-deploy`, `record-review`, `drift-check`, `tests` |
+| `adr/` | Where the build follows the design and where it differs |
+| `index.html` | The design document |
 
 ## Two loops, one sprint
 

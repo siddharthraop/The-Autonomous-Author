@@ -1,0 +1,20 @@
+[project]
+name = "autonomous-author"
+version = "0.2.0"
+description = "Drafts a docs-as-code pull request for every merged code change, with a source for every sentence."
+requires-python = ">=3.10"
+dependencies = ["pyyaml>=6", "sphinx>=7", "myst-parser>=3"]
+
+[project.optional-dependencies]
+model = ["google-adk>=1.0"]
+test = ["pytest>=8"]
+
+[project.scripts]
+author = "author.cli:main"
+
+[tool.setuptools]
+packages = ["author"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"

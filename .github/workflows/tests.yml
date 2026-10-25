@@ -1,0 +1,16 @@
+name: tests
+on:
+  push:
+    branches: [main]
+    paths: ["author/**", "tests/**", "pyproject.toml", ".github/**"]
+  pull_request:
+    paths: ["author/**", "tests/**", "pyproject.toml"]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-author
+      - run: python -m pytest -q tests

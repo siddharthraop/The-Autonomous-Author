@@ -1,0 +1,18 @@
+{"model": "scripted-rollout",
+ "draft": {"edits": [
+   {"path": "docs/nat/troubleshooting.md",
+    "find": "A closed TCP connection stays in TIME_WAIT for 120 seconds before its port can",
+    "replace": "A closed TCP connection stays in TIME_WAIT for {{ nat_tcp_time_wait_default }} on new gateways and 120 seconds on existing gateways before its port can"},
+   {"path": "docs/nat/tune-nat-configuration.md",
+    "find": "| UDP | {{ nat_udp_default }} | `--udp-idle-timeout` |\n",
+    "replace": "| UDP | {{ nat_udp_default }} | `--udp-idle-timeout` |\n\nExisting gateways keep a TIME_WAIT default of 120 seconds. The new default applies in all regions from 1 November 2026.\n"},
+   {"path": "docs/nat/tune-nat-configuration.md",
+    "find": "```bash\nnatctl describe my-gateway\n```\n",
+    "replace": "```bash\nnatctl describe my-gateway\n```\n\nTo see the TIME_WAIT timeout in effect, read the `effectiveTcpTimeWaitTimeoutSec` field.\n"}],
+  "sentences": [
+   {"text": "A closed TCP connection stays in TIME_WAIT for {{ nat_tcp_time_wait_default }} on new gateways and 120 seconds on existing gateways before its port can", "sources": ["C1", "C2", "P1"]},
+   {"text": "Existing gateways keep a TIME_WAIT default of 120 seconds.", "sources": ["C2"]},
+   {"text": "The new default applies in all regions from 1 November 2026.", "sources": ["C1"]},
+   {"text": "To see the TIME_WAIT timeout in effect, read the `effectiveTcpTimeWaitTimeoutSec` field.", "sources": ["C3"]}]},
+ "revise": [{"fixes": [{"old": "The new default applies in all regions from 1 November 2026.",
+    "new": "[NEEDS INPUT: Which gateways get the new default, and from what date?]", "sources": ["C1"]}]}]}

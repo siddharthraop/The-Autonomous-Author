@@ -1,0 +1,22 @@
+# Learn from the review: edit ratio, final score and proposed style rules (tool 8).
+name: record-review
+on:
+  pull_request:
+    types: [closed]
+permissions:
+  contents: write
+  issues: write
+jobs:
+  review:
+    if: startsWith(github.event.pull_request.head.ref, 'author/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-author
+      - env:
+          GITHUB_TOKEN: ${{ github.token }}
+          AUTHOR_BQ_TABLE: ${{ vars.AUTHOR_BQ_TABLE }}
+        run: author review
