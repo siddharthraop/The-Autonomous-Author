@@ -12,6 +12,8 @@ the timeouts, their defaults, and the flags that change them.
 | TCP TIME_WAIT | {{ nat_tcp_time_wait_default }} | `--tcp-time-wait-timeout` |
 | UDP | {{ nat_udp_default }} | `--udp-idle-timeout` |
 
+The minimum value for `--tcp-established-idle-timeout` is 60 [NEEDS INPUT: What unit is used for the TCP established minimum timeout?].
+
 ## Change a timeout
 
 To change a timeout, run `natctl update` with the flag for that timeout:
