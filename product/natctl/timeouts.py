@@ -17,7 +17,7 @@ TIMEOUTS = {
     },
     "tcp_time_wait": {
         "label": "TCP TIME_WAIT",
-        "default": 120,
+        "default": 30,
         "unit": "seconds",
         "flag": "--tcp-time-wait-timeout",
         "field": "tcpTimeWaitTimeoutSec",
