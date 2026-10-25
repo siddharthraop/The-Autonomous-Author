@@ -23,7 +23,7 @@ TIMEOUTS = {
         "unit": "seconds",
         "flag": "--tcp-time-wait-timeout",
         "field": "tcpTimeWaitTimeoutSec",
-        "minimum": 15,
+        "minimum": 20,
     },
     "udp": {
         "label": "UDP",
