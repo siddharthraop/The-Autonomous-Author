@@ -13,8 +13,8 @@ jobs:
     env:
       FIREBASE_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with: {python-version: "3.12"}
       - run: pip install -q -e . && python -m sphinx -W -q -b html docs docs/_build/html
       - name: Staging (on merge)

@@ -25,7 +25,7 @@ jobs:
       branch: ${{ steps.draft.outputs.branch }}
       sha: ${{ steps.draft.outputs.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - uses: ./.github/actions/setup-author
@@ -54,7 +54,7 @@ jobs:
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
         run: |
           author draft --base "${{ inputs.base || github.event.before }}" --head "${{ github.sha }}" --model auto --publish
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: always()
         with:
           name: author-run

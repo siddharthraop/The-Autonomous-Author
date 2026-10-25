@@ -64,8 +64,8 @@ def read_change(repo, base, head):
     """Return (items, diff_text) for the change between two revisions."""
     old_src, new_src = show(repo, base, SETTINGS), show(repo, head, SETTINGS)
     diff = git(repo, "diff", "--unified=2", base, head, "--", "product/")
-    if new_src is None:
-        return [], diff
+    if new_src is None or old_src is None:
+        return [], diff  # removed, or first import: nothing a reader saw has changed
     old, new = _literals(old_src), _literals(new_src)
     o_t, n_t = old.get("TIMEOUTS", {}), new.get("TIMEOUTS", {})
     added = [l[1:].strip() for l in diff.splitlines() if l.startswith("+") and not l.startswith("+++")]

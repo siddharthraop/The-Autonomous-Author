@@ -87,7 +87,15 @@ def cmd_draft(a):
         "",
         "A writer reviews and approves this pull request. The agent cannot merge it.",
         f"<!-- autonomous-author run={run['run_id']} head={head} -->"])
-    created = gh.open_pr(branch, a.target, f"Docs draft: {subject}", body, draft=True)
+    try:
+        created = gh.open_pr(branch, a.target, f"Docs draft: {subject}", body, draft=True)
+    except Exception as e:
+        detail = getattr(e, "read", lambda: b"")().decode()[:300]
+        print(f"::error title=Draft pull request not opened::{e} {detail} Branch {branch} is pushed. "
+              "If this is a 403, turn on Settings > Actions > General > Workflow permissions > "
+              "'Allow GitHub Actions to create and approve pull requests', then re-run.")
+        runlog.append(repo, row({**run, "result": "branch only"}))
+        return 1
     num = created["number"]
     gh.comment(num, report)
     band = {"ready for review": "ready-for-review", "review closely": "review-closely", "needs writer": "needs-writer"}[sc["label"]]
