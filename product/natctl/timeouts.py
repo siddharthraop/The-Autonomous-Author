@@ -47,4 +47,5 @@ DESCRIBE_FIELDS = [
     "tcpTimeWaitTimeoutSec",
     "udpIdleTimeoutSec",
     "effectiveTcpTimeWaitTimeoutSec",
+    "icmpIdleTimeoutSec",
 ]
