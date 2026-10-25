@@ -14,6 +14,7 @@ TIMEOUTS = {
         "unit": "seconds",
         "flag": "--tcp-transitory-idle-timeout",
         "field": "tcpTransitoryIdleTimeoutSec",
+        "minimum": 5,
     },
     "tcp_time_wait": {
         "label": "TCP TIME_WAIT",
