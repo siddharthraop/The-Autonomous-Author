@@ -31,13 +31,16 @@ jobs:
       - uses: ./.github/actions/setup-author
       - name: Authenticate to Google Cloud (keyless)
         if: vars.GCP_WIF_PROVIDER != ''
-        uses: google-github-actions/auth@v2
+        continue-on-error: true   # no key means no-model mode, not no draft
+        uses: google-github-actions/auth@v3
         with:
+          project_id: ${{ vars.GCP_PROJECT }}
           workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
           service_account: ${{ vars.GCP_DEPLOY_SA }}
       - name: Read the Gemini key from Secret Manager
         id: secrets
         if: vars.GCP_WIF_PROVIDER != ''
+        continue-on-error: true
         uses: google-github-actions/get-secretmanager-secrets@v2
         with:
           secrets: |-
