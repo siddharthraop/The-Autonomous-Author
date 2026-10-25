@@ -1,5 +1,7 @@
 # Tune NAT configuration
 
+[NEEDS INPUT: C1 — New setting ICMP: default 30 seconds, flag --icmp-idle-timeout, field icmpIdleTimeoutSec. How should this page describe it?]
+
 A NAT gateway closes idle connections when a timeout expires. This page lists
 the timeouts, their defaults, and the flags that change them.
 
