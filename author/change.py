@@ -92,7 +92,9 @@ def read_change(repo, base, head):
                 old=p.get("flag"), new=t.get("flag"), **base_kw)
         for attr in sorted((set(p) | set(t)) - KNOWN):
             if p.get(attr) != t.get(attr):
-                add("attribute", name, f"{t['label']}: {attr} changed from {p.get(attr)} to {t.get(attr)}.",
+                unit = f" {t.get('unit')}" if isinstance(t.get(attr), (int, float)) and t.get("unit") else ""
+                was = "not set" if p.get(attr) is None else f"{p.get(attr)}{unit}"
+                add("attribute", name, f"{t['label']}: {attr} changed from {was} to {t.get(attr)}{unit}.",
                     old=p.get(attr), new=t.get(attr), attribute=attr, **base_kw)
     old_f, new_f = old.get("DESCRIBE_FIELDS", []), new.get("DESCRIBE_FIELDS", [])
     for f in new_f:
