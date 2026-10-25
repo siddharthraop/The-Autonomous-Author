@@ -10,3 +10,5 @@ with `--tcp-time-wait-timeout`.
 
 Check the established timeout with `natctl describe`. The default is
 {{ nat_tcp_established_default }}.
+
+[NEEDS INPUT: C1 — New output field icmpIdleTimeoutSec in natctl describe. How should this page describe it?]
