@@ -1,0 +1,47 @@
+{
+ "run_id": "73f5b79a77cf",
+ "base": "ebf61cb380b24151f11483d5749ace245446988e",
+ "head": "af4ff2f82cd09ee735099169de9a324020d0169e",
+ "items": [
+  {
+   "id": "C1",
+   "kind": "default",
+   "name": "tcp_transitory",
+   "text": "TCP transitory default changed from 30 to 50 seconds.",
+   "old": 30,
+   "new": 50,
+   "unit": "seconds",
+   "label": "TCP transitory",
+   "flag": "--tcp-transitory-idle-timeout",
+   "field": "tcpTransitoryIdleTimeoutSec",
+   "key": "nat_tcp_transitory_default",
+   "path": "product/natctl/timeouts.py",
+   "line": 11,
+   "attribute": "",
+   "evidence": []
+  }
+ ],
+ "source_map": [
+  {
+   "text": "[NEEDS INPUT: C1 \u2014 TCP transitory default changed from 30 to 50 seconds. How should this page describe it?]",
+   "sources": [
+    "C1"
+   ],
+   "origin": "placeholder"
+  }
+ ],
+ "source_index": {
+  "C1": "code change, `product/natctl/timeouts.py` line 11",
+  "P1": "`docs/nat/tune-nat-configuration.md` at `af4ff2f`, before the draft",
+  "S-SUBS": "`docs/substitutions.yml` at `af4ff2f`",
+  "S-PR": "code PR #11 description"
+ },
+ "model": "gemini-3.8-flash",
+ "prompt_version": "p1.0",
+ "sources": {
+  "C1": "TCP transitory default changed from 30 to 50 seconds. TCP transitory --tcp-transitory-idle-timeout tcpTransitoryIdleTimeoutSec 30 50 seconds",
+  "P1": "# Tune NAT configuration\n\nA NAT gateway closes idle connections when a timeout expires. This page lists\nthe timeouts, their defaults, and the flags that change them.\n\n## Timeouts\n\n| Timeout | Default | Flag |\n| --- | --- | --- |\n| TCP established | {{ nat_tcp_established_default }} | `--tcp-established-idle-timeout` |\n| TCP transitory | {{ nat_tcp_transitory_default }} | `--tcp-transitory-idle-timeout` |\n| TCP TIME_WAIT | {{ nat_tcp_time_wait_default }} | `--tcp-time-wait-timeout` |\n| UDP | {{ nat_udp_default }} | `--udp-idle-timeout` |\n\n## Change a timeout\n\nTo change a timeout, run `natctl update` with the flag for that timeout:\n\n```bash\nnatctl update my-gateway --tcp-time-wait-timeout=60\n```\n\n## Describe a gateway\n\nTo see the settings of a gateway, run `natctl describe`:\n\n```bash\nnatctl describe my-gateway\n```\n\nThe output includes `effectiveTcpTimeWaitTimeoutSec` to show the TIME_WAIT timeout in effect.\n\nSee also [Troubleshooting](troubleshooting.md).\n",
+  "S-SUBS": "nat_tcp_established_default: 1200 seconds\nnat_tcp_transitory_default: 30 seconds\nnat_tcp_time_wait_default: 120 seconds\nnat_udp_default: 30 seconds\n",
+  "S-PR": "changed the timeout from 30-50"
+ }
+}
