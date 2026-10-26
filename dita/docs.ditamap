@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<map>
+  <title>natctl documentation</title>
+  <keydef keys="nat-tcp-established-default"><topicmeta><keywords><keyword>1200 seconds</keyword></keywords></topicmeta></keydef>
+  <keydef keys="nat-tcp-transitory-default"><topicmeta><keywords><keyword>30 seconds</keyword></keywords></topicmeta></keydef>
+  <keydef keys="nat-tcp-time-wait-default"><topicmeta><keywords><keyword>120 seconds</keyword></keywords></topicmeta></keydef>
+  <keydef keys="nat-udp-default"><topicmeta><keywords><keyword>30 seconds</keyword></keywords></topicmeta></keydef>
+  <topicref href="nat/tune-nat-configuration.dita"/>
+  <topicref href="nat/troubleshooting.dita"/>
+</map>

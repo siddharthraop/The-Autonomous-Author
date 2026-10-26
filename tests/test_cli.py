@@ -34,6 +34,9 @@ def test_commit_feature_gets_draft_and_checks_pass(tmp_path):
     assert "Pushed author/" in out.stdout, out.stdout + out.stderr
     branch = next(l.split()[1].rstrip(".") for l in out.stdout.splitlines() if l.startswith("Pushed "))
     assert run(work, "git", "ls-remote", str(remote), branch).stdout
+    files = run(work, "git", "show", "--name-only", "--format=", "HEAD").stdout.split()
+    assert "docs/substitutions.yml" in files and "dita/docs.ditamap" in files, files
+    assert "<keyword>30 seconds</keyword>" in (work / "dita/docs.ditamap").read_text()
     log = run(work, "git", "log", "-1", "--format=%an <%ae>").stdout
     assert log.startswith("Autonomous Author")
     g("fetch", "-q", "origin")

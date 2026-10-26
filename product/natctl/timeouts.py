@@ -7,7 +7,6 @@ TIMEOUTS = {
         "unit": "seconds",
         "flag": "--tcp-established-idle-timeout",
         "field": "tcpEstablishedIdleTimeoutSec",
-        "minimum": 60,
     },
     "tcp_transitory": {
         "label": "TCP transitory",
@@ -15,15 +14,13 @@ TIMEOUTS = {
         "unit": "seconds",
         "flag": "--tcp-transitory-idle-timeout",
         "field": "tcpTransitoryIdleTimeoutSec",
-        "minimum": 5,
     },
     "tcp_time_wait": {
         "label": "TCP TIME_WAIT",
-        "default": 30,
+        "default": 120,
         "unit": "seconds",
         "flag": "--tcp-time-wait-timeout",
         "field": "tcpTimeWaitTimeoutSec",
-        "minimum": 15,
     },
     "udp": {
         "label": "UDP",
@@ -31,14 +28,6 @@ TIMEOUTS = {
         "unit": "seconds",
         "flag": "--udp-idle-timeout",
         "field": "udpIdleTimeoutSec",
-        "minimum": 10,
-    },
-    "icmp": {
-        "label": "ICMP",
-        "default": 30,
-        "unit": "seconds",
-        "flag": "--icmp-idle-timeout",
-        "field": "icmpIdleTimeoutSec",
     },
 }
 
@@ -49,6 +38,4 @@ DESCRIBE_FIELDS = [
     "tcpTransitoryIdleTimeoutSec",
     "tcpTimeWaitTimeoutSec",
     "udpIdleTimeoutSec",
-    "effectiveTcpTimeWaitTimeoutSec",
-    "icmpIdleTimeoutSec",
 ]

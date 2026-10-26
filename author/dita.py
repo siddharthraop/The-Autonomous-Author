@@ -175,3 +175,28 @@ def diff(before, after):
         if a != b:
             out[path] = "".join(difflib.unified_diff(a.splitlines(True), b.splitlines(True), f"a/{path}", f"b/{path}", n=2))
     return out
+
+
+def write(repo):
+    """Regenerate dita/ from docs/ on disk. Returns (changed paths, validation errors)."""
+    root = pathlib.Path(repo)
+    files = convert(repo)
+    changed = []
+    for path, text in files.items():
+        f = root / path
+        if not f.exists() or f.read_text() != text:
+            f.parent.mkdir(parents=True, exist_ok=True)
+            f.write_text(text)
+            changed.append(path)
+    for f in (root / "dita").rglob("*"):
+        rel = str(f.relative_to(root))
+        if f.is_file() and rel not in files:
+            f.unlink()
+            changed.append(rel)
+    return changed, validate(files)
+
+
+def out_of_sync(repo):
+    """Paths in dita/ that don't match what docs/ generates."""
+    root = pathlib.Path(repo)
+    return [p for p, t in convert(repo).items() if not (root / p).exists() or (root / p).read_text() != t]

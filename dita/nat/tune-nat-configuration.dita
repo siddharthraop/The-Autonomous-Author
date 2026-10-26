@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<topic id="tune-nat-configuration">
+  <title>Tune NAT configuration</title>
+  <body>
+    <p>A NAT gateway closes idle connections when a timeout expires. This page lists the timeouts, their defaults, and the flags that change them.</p>
+    <section id="timeouts"><title>Timeouts</title>
+    <simpletable>
+    <sthead><stentry>Timeout</stentry><stentry>Default</stentry><stentry>Flag</stentry></sthead>
+    <strow><stentry>TCP established</stentry><stentry><keyword keyref="nat-tcp-established-default"/></stentry><stentry><codeph>--tcp-established-idle-timeout</codeph></stentry></strow>
+    <strow><stentry>TCP transitory</stentry><stentry><keyword keyref="nat-tcp-transitory-default"/></stentry><stentry><codeph>--tcp-transitory-idle-timeout</codeph></stentry></strow>
+    <strow><stentry>TCP TIME_WAIT</stentry><stentry><keyword keyref="nat-tcp-time-wait-default"/></stentry><stentry><codeph>--tcp-time-wait-timeout</codeph></stentry></strow>
+    <strow><stentry>UDP</stentry><stentry><keyword keyref="nat-udp-default"/></stentry><stentry><codeph>--udp-idle-timeout</codeph></stentry></strow>
+    </simpletable>
+    </section>
+    <section id="change-a-timeout"><title>Change a timeout</title>
+    <p>To change a timeout, run <codeph>natctl update</codeph> with the flag for that timeout:</p>
+    <codeblock outputclass="language-bash">natctl update my-gateway --tcp-time-wait-timeout=60</codeblock>
+    </section>
+    <section id="describe-a-gateway"><title>Describe a gateway</title>
+    <p>To see the settings of a gateway, run <codeph>natctl describe</codeph>:</p>
+    <codeblock outputclass="language-bash">natctl describe my-gateway</codeblock>
+    <p>See also <xref href="troubleshooting.dita">Troubleshooting</xref>.</p>
+    </section>
+  </body>
+</topic>

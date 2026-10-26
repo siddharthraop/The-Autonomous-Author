@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<topic id="troubleshooting">
+  <title>Troubleshooting NAT</title>
+  <body>
+    <section id="connections-are-reused-too-early"><title>Connections are reused too early</title>
+    <p>A closed TCP connection stays in TIME_WAIT for 120 seconds before its port can be reused. If new connections fail because no ports are free, lower the value with <codeph>--tcp-time-wait-timeout</codeph>.</p>
+    </section>
+    <section id="idle-connections-drop"><title>Idle connections drop</title>
+    <p>Check the established timeout with <codeph>natctl describe</codeph>. The default is <keyword keyref="nat-tcp-established-default"/>.</p>
+    </section>
+  </body>
+</topic>

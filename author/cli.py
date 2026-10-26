@@ -6,7 +6,7 @@ import pathlib
 import subprocess
 import sys
 
-from . import drift as drift_mod, model as models, review as review_mod, runlog
+from . import dita, drift as drift_mod, model as models, review as review_mod, runlog
 from .change import Item
 from .github import GitHub
 from .gitio import git, resolve, show
@@ -54,6 +54,8 @@ def cmd_draft(a):
             runlog.append(repo, row(run))
         _output(result="none")
         return 0
+    changed, errors = dita.write(repo)
+    run["dita"] = {"changed": changed, "errors": errors}
     report = render(run)
     (OUT / "report.md").write_text(report)
     print(report)
@@ -66,8 +68,8 @@ def cmd_draft(a):
     keep["sources"] = run["sources"]
     (drafts / f"{run['run_id']}.json").write_text(json.dumps(keep, indent=1, default=str))
     git(repo, "checkout", "-q", "-B", branch)
-    touched = sorted({e["path"] for e in run["edits"]})  # stage only what the agent edited
-    git(repo, "add", "--", *touched, str(drafts / f"{run['run_id']}.json"))
+    touched = sorted({e["path"] for e in run["edits"]} | set(run["dita"]["changed"]))  # only what the agent changed
+    git(repo, "add", "-A", "--", *touched, str(drafts / f"{run['run_id']}.json"))
     subject = git(repo, "log", "-1", "--format=%s", head).strip()
     git(repo, *AGENT, "commit", "-q", "-m", f"Docs draft for {head[:7]}: {subject}\n\nRun {run['run_id']}. Confidence {run['score']['total']} / 10.")
     git(repo, "push", "-q", "-f", "origin", f"HEAD:refs/heads/{branch}")
@@ -150,6 +152,7 @@ def _check_run(repo, base_ref):
             index.update(d["source_index"])
             meta = d
     res = finish(repo, base_text, items, smap, sources, writer_ok=True)
+    res["dita"] = {"changed": [], "errors": dita.validate(dita.convert(repo)), "out_of_sync": dita.out_of_sync(repo)}
     run = {"run_id": meta.get("run_id", "check"), "base": mb, "head": resolve(repo, "HEAD"), "model": meta.get("model", "n/a"),
            "prompt_version": meta.get("prompt_version", "n/a"), "items": [i.to_dict() for i in items],
            "source_index": index, "edits": [], "revisions": 0, "revised": [], **res}
@@ -161,7 +164,8 @@ def cmd_check(a):
     g = run["grounding"]
     problems = [s for s in g["sentences"] if s["status"] == "fail"]
     ok = run["build"]["build"] and not problems and not g["stale"] and run["style"]["errors"] == 0 \
-        and run["build"]["links_ok"] and run["style"]["ran"]
+        and run["build"]["links_ok"] and run["style"]["ran"] \
+        and not run["dita"]["errors"] and not run["dita"]["out_of_sync"]
     text = render(run).replace(MARK, "<!-- autonomous-author:docs-checks -->").replace("Autonomous Author draft", "docs-checks")
     writer = [s for s in g["sentences"] if s["status"] == "writer"]
     if writer:
@@ -219,6 +223,14 @@ def cmd_drift(a):
     return 0
 
 
+def cmd_dita(a):
+    changed, errors = dita.write(".")
+    print("\n".join(f"wrote {c}" for c in changed) or "dita/ is up to date")
+    for e in errors:
+        print(f"::error title=DITA not valid::{e}")
+    return 1 if errors else 0
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(prog="author")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -232,9 +244,10 @@ def main(argv=None):
     r = sub.add_parser("review", help="record a closed docs PR")
     r.add_argument("--event")
     sub.add_parser("drift", help="daily drift check")
+    sub.add_parser("dita", help="regenerate dita/ from docs/ and validate it")
     a = p.parse_args(argv)
     try:
-        return {"draft": cmd_draft, "check": cmd_check, "review": cmd_review, "drift": cmd_drift}[a.cmd](a)
+        return {"draft": cmd_draft, "check": cmd_check, "review": cmd_review, "drift": cmd_drift, "dita": cmd_dita}[a.cmd](a)
     except Exception as e:
         import traceback
         tb = traceback.format_exc().strip().splitlines()

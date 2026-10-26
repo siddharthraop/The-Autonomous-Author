@@ -2,7 +2,7 @@
 name: docs-checks
 on:
   pull_request:
-    paths: ["docs/**", ".author/**", ".vale.ini"]
+    paths: ["docs/**", "dita/**", ".author/**", ".vale.ini"]
   workflow_call:
     inputs:
       ref: {type: string, required: true}

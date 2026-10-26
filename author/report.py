@@ -22,6 +22,12 @@ def render(run):
                  + f" for {', '.join(e['items']) or 'scope'}: {e['why']}")
     if not run["edits"]:
         L.append("- No edits.")
+    if run.get("dita"):
+        d = run["dita"]
+        L += ["", "### DITA", "",
+              (f"The same draft as DITA 1.3, in `dita/`: {', '.join(f'`{c}`' for c in d['changed']) or 'no DITA change'}. "
+               + ("✅ Valid against the OASIS DITA 1.3 DTDs." if not d["errors"] else f"❌ Not valid: {'; '.join(d['errors'])[:300]}")),
+              "Values are `<keyword keyref>` keys defined in `dita/docs.ditamap`; questions are `<draft-comment>` elements."]
     L += ["", "### Where each sentence came from", "", "| Sentence | Source | Check |", "| --- | --- | --- |"]
     for s in sents:
         chk = {"pass": f"✅ literals {s.get('literals', '0/0')}", "question": "❓ question"}.get(s["status"], f"❌ {s.get('reason', '')}")
@@ -42,6 +48,10 @@ def render(run):
     if not st["ran"]:
         checks.append("- ⚠️ Vale did not run; style is not checked.")
     checks += [f"- ✏️ Style {a['severity']}: `{a['path']}` line {a['line']} {a['rule']}: {a['message']}" for a in st["alerts"]]
+    if run.get("dita", {}).get("errors"):
+        checks.append("- ❌ The DITA output isn't valid DITA 1.3.")
+    if run.get("dita", {}).get("out_of_sync"):
+        checks.append(f"- ❌ `dita/` doesn't match `docs/`: {', '.join(run['dita']['out_of_sync'])}. Run `author dita`.")
     b = run["build"]
     if not b["build"]:
         checks.append("- ❌ Sphinx build failed (warnings are errors).")
