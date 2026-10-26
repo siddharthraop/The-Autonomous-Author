@@ -10,7 +10,7 @@ TIMEOUTS = {
     },
     "tcp_transitory": {
         "label": "TCP transitory",
-        "default": 30,
+        "default": 50,
         "unit": "seconds",
         "flag": "--tcp-transitory-idle-timeout",
         "field": "tcpTransitoryIdleTimeoutSec",
