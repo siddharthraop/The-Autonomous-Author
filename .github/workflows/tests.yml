@@ -13,4 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/setup-author
-      - run: pip install -q fastapi uvicorn httpx && python -m pytest -q tests
+      - run: |
+          python -m pytest -q -rf tests 2>&1 | tee pytest.log; status=${PIPESTATUS[0]}
+          grep -E "^FAILED|Error" pytest.log | head -5 | while read -r l; do echo "::error title=test failed::$l"; done
+          exit $status
