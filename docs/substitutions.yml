@@ -1,4 +1,4 @@
 nat_tcp_established_default: 1200 seconds
-nat_tcp_transitory_default: 30 seconds
+nat_tcp_transitory_default: 50 seconds
 nat_tcp_time_wait_default: 120 seconds
 nat_udp_default: 30 seconds

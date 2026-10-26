@@ -12,6 +12,7 @@
     <strow><stentry>TCP TIME_WAIT</stentry><stentry><keyword keyref="nat-tcp-time-wait-default"/></stentry><stentry><codeph>--tcp-time-wait-timeout</codeph></stentry></strow>
     <strow><stentry>UDP</stentry><stentry><keyword keyref="nat-udp-default"/></stentry><stentry><codeph>--udp-idle-timeout</codeph></stentry></strow>
     </simpletable>
+    <p><draft-comment author="autonomous-author" disposition="open">NEEDS INPUT: C1 — TCP transitory default changed from 30 to 50 seconds. How should this page describe it?</draft-comment></p>
     </section>
     <section id="change-a-timeout"><title>Change a timeout</title>
     <p>To change a timeout, run <codeph>natctl update</codeph> with the flag for that timeout:</p>

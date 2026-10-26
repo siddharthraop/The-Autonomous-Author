@@ -12,6 +12,8 @@ the timeouts, their defaults, and the flags that change them.
 | TCP TIME_WAIT | {{ nat_tcp_time_wait_default }} | `--tcp-time-wait-timeout` |
 | UDP | {{ nat_udp_default }} | `--udp-idle-timeout` |
 
+[NEEDS INPUT: C1 — TCP transitory default changed from 30 to 50 seconds. How should this page describe it?]
+
 ## Change a timeout
 
 To change a timeout, run `natctl update` with the flag for that timeout:

@@ -3,7 +3,7 @@
 <map>
   <title>natctl documentation</title>
   <keydef keys="nat-tcp-established-default"><topicmeta><keywords><keyword>1200 seconds</keyword></keywords></topicmeta></keydef>
-  <keydef keys="nat-tcp-transitory-default"><topicmeta><keywords><keyword>30 seconds</keyword></keywords></topicmeta></keydef>
+  <keydef keys="nat-tcp-transitory-default"><topicmeta><keywords><keyword>50 seconds</keyword></keywords></topicmeta></keydef>
   <keydef keys="nat-tcp-time-wait-default"><topicmeta><keywords><keyword>120 seconds</keyword></keywords></topicmeta></keydef>
   <keydef keys="nat-udp-default"><topicmeta><keywords><keyword>30 seconds</keyword></keywords></topicmeta></keydef>
   <topicref href="nat/tune-nat-configuration.dita"/>
