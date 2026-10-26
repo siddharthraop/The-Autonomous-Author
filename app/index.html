@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Autonomous Author</title>
+<meta name="description" content="Commit a feature and get a first docs draft, in docs as code and DITA, ready for a writer's review.">
+<link rel="stylesheet" href="app.css">
+<script src="config.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <a class="brand" href="./">THE AUTONOMOUS AUTHOR</a>
+  <nav class="main" aria-label="Pages">
+    <a href="./" aria-current="page">Ship a feature</a>
+    <a id="design-link" href="../">Design document</a>
+    <a id="repo-link" href="#">Source</a>
+  </nav>
+  <span class="spacer"></span>
+  <span id="live" class="meta" aria-live="polite">Connecting…</span>
+  <button class="btn" id="theme" type="button" aria-label="Switch light or dark theme">Theme</button>
+</header>
+<main id="main" tabindex="-1">
+  <section class="intro">
+    <h1>Ship a feature. Get the docs draft.</h1>
+    <p>Pick a sample feature, or write your own, and commit it. The agent reads the code change, finds every page it affects,
+      drafts the update in <strong>docs as code</strong> (MyST Markdown) and <strong>DITA 1.3</strong>, checks every sentence
+      against its source, and hands the draft to you for review. Then compare what it did with what a good draft should do.</p>
+  </section>
+
+  <section class="step" aria-labelledby="s1">
+    <h2 id="s1"><span class="n">1</span> Describe the feature</h2>
+    <div class="samples" id="samples" role="radiogroup" aria-label="Sample features"></div>
+    <div class="feature">
+      <div id="custom" hidden>
+        <div class="grid">
+          <label>Change<select id="c-kind">
+            <option value="default">Change a default</option>
+            <option value="minimum">Add a minimum value</option>
+            <option value="field">Add an output field to natctl describe</option>
+            <option value="setting">Add a new timeout</option></select></label>
+          <label id="c-setting-l">Timeout<select id="c-setting">
+            <option value="tcp_established">TCP established</option><option value="tcp_transitory">TCP transitory</option>
+            <option value="tcp_time_wait" selected>TCP TIME_WAIT</option><option value="udp">UDP</option></select></label>
+          <label id="c-value-l">Seconds<input id="c-value" type="number" min="1" max="86400" value="60"></label>
+          <label id="c-name-l" hidden>Name<input id="c-name" type="text" value="icmp" spellcheck="false"></label>
+        </div>
+      </div>
+      <label>Commit title<input id="f-title" type="text" maxlength="100"></label>
+      <label>What the feature does and why <span class="meta">(the developer's words; the agent may quote only what's here or in the code)</span>
+        <textarea id="f-text" rows="4" maxlength="1500"></textarea></label>
+      <div class="grid">
+        <label>Doc type<select id="f-doctype"><option>reference</option><option>task</option><option>concept</option></select></label>
+        <label>Audience<input id="f-audience" type="text" value="network operators" maxlength="60"></label>
+      </div>
+      <details open><summary>The code change that will be committed</summary><pre class="diff" id="f-diff"></pre></details>
+      <p class="why" id="f-why"></p>
+      <button class="btn btn-fill" id="commit" type="button">Commit feature</button>
+      <p class="meta" id="commit-note"></p>
+    </div>
+  </section>
+
+  <section class="step" aria-labelledby="s2" id="step2" hidden>
+    <h2 id="s2"><span class="n">2</span> Watch the agent</h2>
+    <ol class="stages" id="stages" aria-live="polite"></ol>
+  </section>
+
+  <section class="step" aria-labelledby="s3" id="step3" hidden>
+    <h2 id="s3"><span class="n">3</span> Review the first draft</h2>
+    <div class="summary" id="summary"></div>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div id="panels"></div>
+    <div class="review" id="review"></div>
+  </section>
+</main>
+<footer class="foot"><p>A proof of concept by Siddharth Rao. The demo runs on a sample product, natctl, in a sandbox:
+  nothing is published, and drafts are deleted after an hour.</p></footer>
+<script src="app.js"></script>
+</body>
+</html>

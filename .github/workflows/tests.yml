@@ -2,7 +2,7 @@ name: tests
 on:
   push:
     branches: [main]
-    paths: ["author/**", "tests/**", "pyproject.toml", ".github/**"]
+    paths: ["author/**", "api/**", "sample/**", "tests/**", "pyproject.toml", ".github/**"]
   pull_request:
     paths: ["author/**", "tests/**", "pyproject.toml"]
 permissions:
@@ -13,4 +13,4 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/setup-author
-      - run: python -m pytest -q tests
+      - run: pip install -q fastapi uvicorn httpx && python -m pytest -q tests

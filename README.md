@@ -19,7 +19,13 @@ changes a feature in `product/` and pushes it to `main`; within minutes a draft
 docs pull request opens with MyST changes, a confidence score and an
 explainability report, and a writer must approve it.
 
-### Try it
+### Try it in your browser
+
+**[Open the live demo](https://siddharthraop.github.io/The-Autonomous-Author/app/)**. Pick a sample feature (or
+write your own) and commit it. Watch the agent's stages, then review the first draft in docs as code (MyST) and
+DITA 1.3, compare it with what a good draft for that feature does, answer the agent's questions, and approve.
+
+### Try it in the repository
 
 1. Change a default in `product/natctl/timeouts.py`, for example
    `"default": 120` to `"default": 30` for `tcp_time_wait`.

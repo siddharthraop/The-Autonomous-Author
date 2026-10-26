@@ -19,7 +19,7 @@ def test_commit_feature_gets_draft_and_checks_pass(tmp_path):
     run(tmp_path, "git", "init", "-q", "--bare", "-b", "main", str(remote))
     work.mkdir()
     for d in ("product", "docs"):
-        shutil.copytree(ROOT / "tests/fixtures/base" / d, work / d)
+        shutil.copytree(ROOT / "sample" / d, work / d)
     if (ROOT / ".vale").exists():
         shutil.copytree(ROOT / ".vale", work / ".vale")
     shutil.copy(ROOT / ".vale.ini", work)

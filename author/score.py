@@ -20,4 +20,6 @@ def score(grounding, style, build):
     penalty = round(0.5 * questions, 1)
     total = max(1.0, round(sum(parts.values()) - penalty, 1))
     label = "ready for review" if total >= 8.5 else "review closely" if total >= 6.0 else "needs writer"
+    if questions and label == "ready for review":
+        label = "review closely"  # open questions always need a person
     return {"total": total, "parts": parts, "questions": questions, "penalty": penalty, "label": label}

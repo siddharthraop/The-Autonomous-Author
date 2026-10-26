@@ -62,8 +62,11 @@ def _prompt(items, ticket, pr_body, pages, rule_edits, extra=""):
     return "\n\n".join(parts) + ("\n\n" + extra if extra else "")
 
 
-def draft(repo, base, head, model=None, ticket=None, pr=None, change_author=None, gh=None, ticket_file=None):
+def draft(repo, base, head, model=None, ticket=None, pr=None, change_author=None, gh=None, ticket_file=None,
+          ticket_data=None, progress=None):
+    """Run the agent loop. `progress(stage, detail)` reports each step; `ticket_data` supplies the doc ticket directly."""
     from .ticket import read_ticket
+    say = progress or (lambda stage, detail="": None)
     t0 = time.time()
     model = model or NoModel()
     root = pathlib.Path(repo)
@@ -73,12 +76,14 @@ def draft(repo, base, head, model=None, ticket=None, pr=None, change_author=None
            "model": model.id, "prompt_version": PROMPT_VERSION, "code_pr": (pr or {}).get("number"),
            "change_author": change_author, "items": [i.to_dict() for i in items], "revisions": 0,
            "revised": [], "rejected": [], "edits": []}
+    say("change", f"{len(items)} change item(s): " + "; ".join(f"{i.id} {i.text}" for i in items) if items else "no reader-visible change")
     if not items:
         run.update(result="no docs change", seconds=round(time.time() - t0, 1))
         return run
     ref = ticket or ticket_ref((pr or {}).get("body")) or ticket_ref(commit_messages(repo, base, head))
-    tk = read_ticket(ref, gh=gh, local=ticket_file)
+    tk = ticket_data or read_ticket(ref, gh=gh, local=ticket_file)
     run["ticket"] = tk
+    say("ticket", f"doc ticket {tk['ref']}: doc type {tk.get('doc_type', 'not set')}, audience {tk.get('audience', 'not set')}" if tk else "no doc ticket linked")
     base_text = {p: (root / p).read_text() for p in doc_files(repo)}
     base_subs = (root / SUBS).read_text()
     hits = find_pages(repo, items, scope=(tk or {}).get("pages"))
@@ -86,6 +91,7 @@ def draft(repo, base, head, model=None, ticket=None, pr=None, change_author=None
     page_paths = sorted({h["path"] for h in hits if h["path"] != SUBS})
     pages = {f"P{n}": (p, base_text[p]) for n, p in enumerate(page_paths, 1)}
     pid = {p: k for k, (p, _) in pages.items()}
+    say("pages", f"{len(page_paths)} page(s): " + ", ".join(page_paths) if page_paths else "no page mentions this change")
 
     sources = {i.id: i.source_text() for i in items}
     index = {i.id: f"code change, `{i.path}` line {i.line}" for i in items}
@@ -96,7 +102,8 @@ def draft(repo, base, head, model=None, ticket=None, pr=None, change_author=None
         sources["T1"] = tk.get("text", "") + " " + tk.get("title", "")
         index["T1"] = f"doc ticket {tk['ref']}: doc type {tk.get('doc_type', 'not set')}, audience {tk.get('audience', 'not set')}"
     if pr and pr.get("body"):
-        sources["S-PR"], index["S-PR"] = pr["body"], f"code PR #{pr['number']} description"
+        sources["S-PR"] = pr["body"]
+        index["S-PR"] = f"code PR #{pr['number']} description" if pr.get("number") else "feature description in the commit message"
     run["source_index"] = index
     run["sources"] = sources
 
@@ -108,10 +115,12 @@ def draft(repo, base, head, model=None, ticket=None, pr=None, change_author=None
         if e["rule"] == "R-03":
             source_map.append({"text": e["after"], "sources": [e["item"], pid.get(e["path"], "S-SUBS")], "origin": e["rule"]})
 
+    say("rules", "; ".join(f"{e['rule']} {e['path']}: {e['after']}" for e in rule_edits) or "no fixed rule applies")
     # Model step: draft.
     rule_covered = {e["item"] for e in rule_edits}
     need_model = [i for i in items if i.id not in rule_covered or i.kind != "default"]
     if need_model and pages and not isinstance(model, NoModel):
+        say("model_start", f"{model.id} is drafting {len(need_model)} change item(s)")
         try:
             out = model.draft(_prompt(items, tk, (pr or {}).get("body"), pages, rule_edits))
         except Exception as e:  # a model failure costs the wording, never the draft
@@ -133,11 +142,15 @@ def draft(repo, base, head, model=None, ticket=None, pr=None, change_author=None
                                                   for c in s.get("sources", []) if c.startswith("C")}),
                                  "why": "drafted by the model"})
         source_map += [{"text": s["text"], "sources": s.get("sources", []), "origin": "model"} for s in out.get("sentences", [])]
+        say("model", run.get("model_error") or f"{len(out.get('edits', []))} edit(s), {len(out.get('sentences', []))} sentence(s) with sources")
+    else:
+        say("model", "not needed: fixed rules covered the change" if not need_model else f"no model ({model.id}); uncovered items become questions")
 
     # Checks and revision loop.
     for attempt in range(MAX_REVISIONS + 1):
         g = check_grounding(repo, base_text, items, source_map, sources)
         failed = [s for s in g["sentences"] if s["status"] == "fail"]
+        say("grounding", f"{len(g['sentences']) - len(failed)}/{len(g['sentences'])} sentences sourced" + (f"; {len(failed)} failed" if failed else ""))
         if not failed:
             break
         if attempt == MAX_REVISIONS or isinstance(model, NoModel):
@@ -148,6 +161,7 @@ def draft(repo, base, head, model=None, ticket=None, pr=None, change_author=None
                     run["revised"].append(f"\"{s['text'][:80]}\" had no checked source ({s['reason']}); replaced with a question.")
             break
         run["revisions"] += 1
+        say("revise", f"revision {run['revisions']}: {len(failed)} sentence(s) sent back to the model")
         fb = "\n".join(f"- \"{s['text']}\" ({s['path']} line {s['line']}): {s['reason']}" for s in failed)
         try:
             out = model.revise(_prompt(items, tk, (pr or {}).get("body"), pages, rule_edits, "## Failed sentences\n" + fb))
@@ -174,7 +188,10 @@ def draft(repo, base, head, model=None, ticket=None, pr=None, change_author=None
         run["edits"].append({"origin": "placeholder", "path": path, "line": hit["line"] if hit else 1,
                              "items": [it.id], "why": "no rule or sourced sentence covers this change item"})
 
+    say("checks", "Vale (Google style), Sphinx build, lychee links")
     run.update(finish(repo, base_text, items, source_map, sources))
+    sc = run["score"]
+    say("score", f"{sc['total']} / 10 · {sc['label']}")
     run["source_map"] = source_map
     run["result"] = "draft"
     run["seconds"] = round(time.time() - t0, 1)
@@ -182,7 +199,7 @@ def draft(repo, base, head, model=None, ticket=None, pr=None, change_author=None
     return run
 
 
-def finish(repo, base_text, items, source_map, sources, writer_ok=False):
+def finish(repo, base_text, items, source_map, sources, writer_ok=False, keep_html=False):
     g = check_grounding(repo, base_text, items, source_map, sources)
     if writer_ok:
         for s in g["sentences"]:
@@ -191,8 +208,11 @@ def finish(repo, base_text, items, source_map, sources, writer_ok=False):
     st = check_style(repo, changed_lines(repo, base_text))
     b = check_build(repo)
     sc = score({**g, "sentences": [dict(s, status="pass" if s["status"] == "writer" else s["status"]) for s in g["sentences"]]}, st, b)
-    b.pop("html", None)
-    return {"grounding": g, "style": st, "build": b, "score": sc}
+    html_dir = b.pop("html", None)
+    out = {"grounding": g, "style": st, "build": b, "score": sc}
+    if keep_html:
+        out["html_dir"] = html_dir
+    return out
 
 
 def row(run):

@@ -1,0 +1,10 @@
+.git
+**/__pycache__
+.author
+docs/_build
+app
+tests
+adr
+images
+index.html
+.github

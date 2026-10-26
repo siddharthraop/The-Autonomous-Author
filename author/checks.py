@@ -57,7 +57,13 @@ def check_grounding(repo, base_text, items, source_map, sources):
             continue
         for line, s in split(base_text.get(path, ""), new):
             sentences.append({"path": path, "line": line, "text": s})
-    by_text = {norm(e["text"]): e for e in source_map}
+    by_text = {}
+    for e in source_map:  # the same sentence can answer several items: merge their sources
+        k = norm(e["text"])
+        if k in by_text:
+            by_text[k] = {**by_text[k], "sources": list(dict.fromkeys(by_text[k]["sources"] + e["sources"]))}
+        else:
+            by_text[k] = e
 
     def entry_for(s):
         n = norm(s)
