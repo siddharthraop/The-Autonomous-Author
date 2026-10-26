@@ -1,0 +1,43 @@
+# Check the live demo the way a visitor uses it: the page, the API, and every sample feature.
+name: live-check
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [".github/workflows/live-check.yml", "app/**"]
+  workflow_run:
+    workflows: [deploy-api]
+    types: [completed]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Page, API and samples
+        env:
+          PAGE: https://siddharthraop.github.io/The-Autonomous-Author/app/
+          API: https://author-api-622389218685.us-central1.run.app
+        run: |
+          sleep 60   # let Pages publish
+          t=$(curl -s "$PAGE" | grep -o '<title>[^<]*' | head -1)
+          echo "::notice title=Page::$PAGE -> ${t#<title>}"
+          echo "::notice title=CORS::$(curl -s -D - -o /dev/null -H 'Origin: https://siddharthraop.github.io' "$API/api/health" | grep -i '^access-control-allow-origin' | tr -d '\r')"
+          echo "::notice title=Health::$(curl -s -m 60 "$API/api/health")"
+          for s in default field minimum rollout; do
+            curl -s -m 240 -X POST "$API/api/features" -H 'Content-Type: application/json' -H 'Origin: https://siddharthraop.github.io' -d "{\"sample\":\"$s\"}" > $s.ndjson
+            python3 - "$s" <<'PY'
+          import json, sys
+          s = sys.argv[1]
+          lines = [json.loads(l) for l in open(f"{s}.ndjson") if l.strip()]
+          last = lines[-1] if lines else {"stage": "error", "detail": "no response"}
+          if last["stage"] != "done":
+              print(f"::error title={s}::{last}"); sys.exit(0)
+          r = last["result"]
+          ok = sum(e["ok"] for e in r["expected"])
+          new = [l[1:] for d in r["myst_diff"].values() for l in d.splitlines() if l.startswith("+") and not l.startswith("+++")]
+          print(f"::notice title={s}: {r['score']['total']}/10 {r['score']['label']}::expected {ok}/{len(r['expected'])} · model {r['model']} · error {r.get('model_error')} · DITA errors {len(r['dita_errors'])} · added: {' | '.join(new)[:400]}")
+          for e in r["expected"]:
+              if not e["ok"]: print(f"::warning title={s} missed::{e['label']} {e['detail']}")
+          PY
+          done
