@@ -20,6 +20,7 @@
     <section id="describe-a-gateway"><title>Describe a gateway</title>
     <p>To see the settings of a gateway, run <codeph>natctl describe</codeph>:</p>
     <codeblock outputclass="language-bash">natctl describe my-gateway</codeblock>
+    <p>The output includes <codeph>effectiveTcpTimeWaitTimeoutSec</codeph> to show the TIME_WAIT timeout in effect.</p>
     <p>See also <xref href="troubleshooting.dita">Troubleshooting</xref>.</p>
     </section>
   </body>
