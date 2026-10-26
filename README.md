@@ -25,6 +25,8 @@ explainability report, and a writer must approve it.
 write your own) and commit it. Watch the agent's stages, then review the first draft in docs as code (MyST) and
 DITA 1.3, compare it with what a good draft for that feature does, answer the agent's questions, and approve.
 
+What version 0.2 can't do yet, with alternatives: [LIMITATIONS.md](LIMITATIONS.md).
+
 ### Try it in the repository
 
 1. Change a default in `product/natctl/timeouts.py`, for example
