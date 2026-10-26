@@ -28,4 +28,6 @@ To see the settings of a gateway, run `natctl describe`:
 natctl describe my-gateway
 ```
 
+The output includes `effectiveTcpTimeWaitTimeoutSec` to show the TIME_WAIT timeout in effect.
+
 See also [Troubleshooting](troubleshooting.md).
